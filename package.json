@@ -1,0 +1,26 @@
+{
+  "name": "ajam",
+  "version": "0.0.1",
+  "description": "persian/farsi language proccessing tools ",
+  "main": "index.js",
+  "repository": "https://github.com/pfndesign/ajam.git",
+  "author": "peyman farahmand <pfndesigen@gmail.com>",
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "tools/*.js",
+    "bin/*.js"
+  ],
+  "bin": {
+    "ajam": "bin/my-new-project-cli.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.17",
+    "@babel/preset-env": "^7.22.15",
+    "babel-jest": "^29.6.4",
+    "jest": "^29.6.4"
+  }
+}
