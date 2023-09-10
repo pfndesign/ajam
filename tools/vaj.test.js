@@ -34,9 +34,9 @@ test("check vaj test for ض ", () => {
 test("check vaj test for اب", () => {
   expect(checkVaj("اب")).toEqual(expect.any(Boolean));
 });
-test("extract هنرمند vaj extract length must be 9", () => {
-  const extract = extractVaj("هُنَرمَند");
-  const extract2 = extractVaj("هنرمند");
+test("extract هنرمند vaj extract length must be 9", async () => {
+  const extract = await extractVaj("هُنَرمَند");
+  const extract2 = await extractVaj("هنرمند");
   expect(extract.length).toEqual(9);
   expect(extract2.length).toEqual(9);
 });

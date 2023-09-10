@@ -6,6 +6,7 @@
   "repository": "https://github.com/pfndesign/ajam.git",
   "author": "peyman farahmand <pfndesigen@gmail.com>",
   "license": "MIT",
+  "type": "module",
   "files": [
     "index.js",
     "tools/*.js",
@@ -22,5 +23,9 @@
     "@babel/preset-env": "^7.22.15",
     "babel-jest": "^29.6.4",
     "jest": "^29.6.4"
+  },
+  "dependencies": {
+    "sequelize": "^6.33.0",
+    "sqlite3": "^5.1.6"
   }
 }

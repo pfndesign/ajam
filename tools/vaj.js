@@ -4,17 +4,7 @@
  * what is the diffrence bettwen vaj and charcter ?
  * in vaj pronunciation is important . charcters with same pronunciation are considers as 1 vaj
  */
-/**
- * what fuction do we need?
- * - isVaj(string) {bool} check if current string is vaj
- * - checkVaj(string) {object} is_vaj then return type of vaj in a object (samet|lowmosavet|highmosavet)
- * - extractVaj(string) {array{object}} return vajs from string
- * - recoverTrueSelf(string) convert a simple word to the same work with correct pronunciation (need database)
- */
-/**
- * what data do we need ?
- * - list of vajs based on types
- */
+import { ajamwords } from "../db/ajam_database.js";
 /**
  * vaj types
  */
@@ -53,7 +43,7 @@ export const VAJ = [
   { char: "َ", type: VAJTYPES.lowmosavet }, // a
   { char: "ِ", type: VAJTYPES.lowmosavet }, // e
   { char: "ُ", type: VAJTYPES.lowmosavet }, // o
-  { char: "ا", type: VAJTYPES.highmosavet }, 
+  { char: "ا", type: VAJTYPES.highmosavet },
   { char: "ی", type: VAJTYPES.highmosavet }, // problem
   { char: "و", type: VAJTYPES.highmosavet }, // problem
 ];
@@ -63,6 +53,7 @@ export const VAJ = [
 const VAJCHECKREGEX = new RegExp(
   "[\u0627-\u0628-\u062a-\u062b-\u062c-\u062d-\u062e-\u062f-\u0630-\u0631-\u0632-\u0633-\u0634-\u0635-\u0636-\u0637-\u0638-\u0639-\u063a-\u0641-\u0642-\u0644-\u0645-\u0646-\u0647-\u0648-\u0648-\u064d-\u064e-\u0650-\u0651-\u067e-\u0686-\u0698-\u06a9-\u06af-\u06cc]{1}"
 );
+const VAJCHECKLOWMOSAVET = new RegExp("[\u064e-\u0650-\u064f]+");
 /**
  * isVaj
  * detect if string is vaj
@@ -87,7 +78,7 @@ export const checkVaj = (string) => {
   let vajdata = { input: string };
   VAJ.every((entry) => {
     if ([...entry.char].includes(string)) {
-      vajdata = {...vajdata,...entry};
+      vajdata = { ...vajdata, ...entry };
       return false;
     }
     return true;
@@ -96,14 +87,39 @@ export const checkVaj = (string) => {
 };
 /**
  * extractVaj
- * convert word to array of it's characters then return vaj data for each character in that word
+ * convert takvaj to array of it's characters then return vaj data for each character in that word
  * @param {string} word
+ * @param {boolean} [withRecover=true] recover trueself
+ * @param {boolean} [force=false] recover trueself for any words
  * @returns {Array}
  */
-export const extractVaj = (word) => {
-  return word.split("").map((character) => checkVaj(character))
+export const extractVaj = async (word, withRecover = true, force = false) => {
+  if (withRecover) word = await recoverTrueSelf(word, force);
+  return word.split("").map((character) => checkVaj(character));
 };
 /**
  * recoverTrueSelf
  * recover word pronunciation for extract vaj
+ * @param {string} word
+ * @param {boolean} [force=false] recover trueself for any words
  */
+export const recoverTrueSelf = async (string, force = false) => {
+  /**
+   * if has mosavet it mean that string is probably trueself
+   */
+  if (VAJCHECKLOWMOSAVET.test(string) && !force) return string;
+  /**
+   * remove any mosavet from string
+   */
+  const cleanstring = string.replace(VAJCHECKLOWMOSAVET, "");
+  const word = await ajamwords.findOne({ where: { word: cleanstring } });
+  /**
+   * return string if cannot fin
+   */
+  if (word == null) return cleanstring;
+  /**
+   * check pronunciation for more than one pronunce
+   * in this case for now we are returning the first one
+   */
+  return word.pronunciation.split("-")[0];
+};
